@@ -8,7 +8,7 @@ try:
 except ImportError:
     pass
 import os
-from os.path import join, pardir, abspath
+from os.path import join, pardir, abspath, sep, splitdrive
 import sys
 
 
@@ -44,6 +44,10 @@ class Option(object):
         return self.default_value
 
 
+def get_root_path(path):
+    drive = splitdrive(path)[0]
+    return '{}\\'.format(drive) if drive else '/'
+
 @singleton
 class Options(object):
     """Option Parser. By now based on ini files"""
@@ -60,7 +64,8 @@ class Options(object):
     def _conf_paths(self):
         paths = []
         current = abspath(".")
-        while current != "/":
+        root = get_root_path(current)
+        while current != root:
             paths.append(join(current, DEFAULT_CONF_NAME))
             current = abspath(join(current, pardir))
         return list(reversed(paths))
